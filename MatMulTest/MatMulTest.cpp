@@ -5,6 +5,7 @@
 #include <iostream>
 #include <immintrin.h> // AVX2 Intrinsic
 #include <omp.h>
+#include <windows.h>
 
 #define M 16
 #define K 32
@@ -20,15 +21,19 @@ struct MATRIX
 	MATRIX(uint16_t rows, uint16_t cols, float* data) : _rows(rows), _cols(cols), _data(data) {}
 };
 
-void MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
+double MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
 {
+	LARGE_INTEGER start, finish, frequency;
+	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&start);
+
 	__m256i idx;
 	// bの縦方向にアクセスするときのオフセット
 	for (int i = 0; i < NUM_FP32_AVX2; i++)
 	{
 		idx.m256i_i32[i] = i * B._cols;
 	}
-//#pragma omp paralell for
+#pragma omp paralell for
 	for (uint16_t i = 0; i < A._rows; i++)
 	{
 		float* pC = C._data + i * C._cols;
@@ -53,6 +58,8 @@ void MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
 			pC[j] = c.m256_f32[0] + c.m256_f32[1] + c.m256_f32[2] + c.m256_f32[3] + c.m256_f32[4] + c.m256_f32[5] + c.m256_f32[6] + c.m256_f32[7];
 		}
 	}
+	QueryPerformanceCounter(&finish);
+	return (double)(finish.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart;
 }
 
 
@@ -66,7 +73,11 @@ int main(int argc, char*argv[])
 	MATRIX b(K, N, B);
 	MATRIX c(M, N, C);
 
-	MatMul(a, b, c);
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+
+	double usec = MatMul(a, b, c);
+	printf("%.3f usec %lld\n", usec, frequency.QuadPart);
 
 	return 0;
 }
