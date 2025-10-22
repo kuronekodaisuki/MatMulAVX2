@@ -18,6 +18,15 @@ int main(int argc, char* argv[])
 	MATRIX b(K, N, B);
 	MATRIX c(M, N, C);
 
+	for (int i = 0; i < M * K; i++)
+	{
+		A[i] = rand() / (float)RAND_MAX;
+	}
+	for (int i = 0; i < K * N; i++)
+	{
+		B[i] = rand() / (float)RAND_MAX;
+	}
+
 	LARGE_INTEGER start, finish, frequency;
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&start);
