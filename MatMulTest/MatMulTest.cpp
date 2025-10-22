@@ -1,15 +1,13 @@
 ﻿// MatMulTest.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
 //
 
-#include "pch.h"
 #include <iostream>
 #include <immintrin.h> // AVX2 Intrinsic
 #include <omp.h>
-#include <windows.h>
+#include <stdint.h>
+#include <Windows.h>
 
-#define M 16
-#define K 32
-#define N 48
+
 #define NUM_FP32_AVX2 8
 
 struct MATRIX
@@ -63,21 +61,3 @@ double MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
 }
 
 
-float A[M * K];
-float B[K * N];
-float C[M * N];
-
-int main(int argc, char*argv[])
-{
-	MATRIX a(M, K, A);
-	MATRIX b(K, N, B);
-	MATRIX c(M, N, C);
-
-	LARGE_INTEGER frequency;
-	QueryPerformanceFrequency(&frequency);
-
-	double usec = MatMul(a, b, c);
-	printf("%.3f usec %lld\n", usec, frequency.QuadPart);
-
-	return 0;
-}
