@@ -16,10 +16,13 @@ int main(int argc, char* argv[])
 	MATRIX b(K, N, B);
 	MATRIX c(M, N, C);
 
-	LARGE_INTEGER frequency;
+	LARGE_INTEGER start, finish, frequency;
 	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&start);
 
-	double usec = MatMul(a, b, c);
+	MatMul(a, b, c);
+	QueryPerformanceCounter(&finish);
+	double usec = (double)(finish.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart;
 	printf("%.3f usec %lld\n", usec, frequency.QuadPart);
 
 	return 0;
