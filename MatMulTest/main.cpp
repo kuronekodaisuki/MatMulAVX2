@@ -2,13 +2,15 @@
 #include <Windows.h>
 #include "MatMul.h"
 
-#define M 16
-#define K 32
-#define N 48
+#define M 160
+#define K 320
+#define N 480
 
 float A[M * K];
 float B[K * N];
 float C[M * N];
+
+using namespace MatMul;
 
 int main(int argc, char* argv[])
 {
@@ -20,10 +22,10 @@ int main(int argc, char* argv[])
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&start);
 
-	MatMul(a, b, c);
+	AVX2(a, b, c);
 	QueryPerformanceCounter(&finish);
-	double usec = (double)(finish.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart;
-	printf("%.3f usec %lld\n", usec, frequency.QuadPart);
+	double usec = (double)(finish.QuadPart - start.QuadPart) * 1000 / frequency.QuadPart;
+	printf("%.3f msec %lld\n", usec, frequency.QuadPart);
 
 	return 0;
 }

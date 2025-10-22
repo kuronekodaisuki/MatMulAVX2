@@ -6,19 +6,15 @@
 #include <omp.h>
 #include <stdint.h>
 
+#include "MatMul.h"
 
 #define NUM_FP32_AVX2 8
 
-struct MATRIX
+#define USE_PREFETCH
+
+namespace MatMul
 {
-	uint16_t _rows;
-	uint16_t _cols;
-	float* _data;
-
-	MATRIX(uint16_t rows, uint16_t cols, float* data) : _rows(rows), _cols(cols), _data(data) {}
-};
-
-double MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
+double AVX2(const MATRIX& A, const MATRIX& B, MATRIX& C)
 {
 	__m256i idx;
 	// bの縦方向にアクセスするときのオフセット
@@ -35,7 +31,9 @@ double MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
 			float* pA = A._data + i * A._cols;
 			float* pB = B._data + j;
 			__m256 a, b, c = { 0, 0, 0, 0, 0, 0, 0, 0 };
-
+#ifdef USE_PREFETCH
+			_mm_prefetch((char const*)(pA + A._cols), _MM_HINT_NTA);
+#endif
 			// C(i, j)を計算
 			for (uint16_t k = 0; k < A._cols; k += NUM_FP32_AVX2)
 			{
@@ -53,5 +51,5 @@ double MatMul(MATRIX& A, MATRIX& B, MATRIX& C)
 	}
 	return 0;
 }
-
+}
 
