@@ -70,8 +70,8 @@ struct Timer {
 #define PREFETCH_T0(ptr) __builtin_prefetch((ptr), 0, 3)
 #define PREFETCH_T1(ptr) __builtin_prefetch((ptr), 0, 2)
 #else
-#define PREFETCH_T0(ptr) _mm_prefetch((const char*)(ptr), _MM_HINT_T0)
-#define PREFETCH_T1(ptr) _mm_prefetch((const char*)(ptr), _MM_HINT_T1)
+#define PREFETCH_T0(ptr) _mm_prefetch((const char*)(ptr), _MM_HINT_NTA)
+#define PREFETCH_T1(ptr) _mm_prefetch((const char*)(ptr), _MM_HINT_NTA)
 #endif
 
 // ── カーネル: ブロッキング + ループ順序(ikj) ─────────────
